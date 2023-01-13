@@ -1,21 +1,22 @@
 import requests
 import pprint
 import json
-from prompt_toolkit import prompt
-from prompt_toolkit.validation import Validator, ValidationError
 from operator import itemgetter
-
-
 pp = pprint.PrettyPrinter(indent=4)
+
+
+def merge(names, values):
+     
+    merged_list = [(names[i], values[i]) for i in range(0, len(values))]
+    return merged_list
 
 response = requests.get("https://swapi.dev/api/starships/")
 data = response.json()
-#pprint.pprint(data)
 
 starship_keys = []
 
+#Here, I wanted the user to be able to sort using any key. since I don't know if each dictionary has the exact same keys, I'll iterate through all the dictionaries in the response and add each key to the list if it does not exist in the list already
 for i in data['results']:
-    #Here, I wanted the user to be able to sort using any key. since I don't know if each dictionary has the exact same keys, I'll iterate through all the dictionaries in the response and add each key to the list if it does not exist in the list already
     key_list = i.keys()
     for x in key_list:
         #print(x)
@@ -27,6 +28,8 @@ print(f'Which value would you like to sort by? You can sort by:')
 print(*starship_keys, sep=", ")
 user_input = input()
 
+
+#This ensures a user's input is valid by checking to see if their input is in the list of keys
 flagname = False
 while not flagname:
     if user_input in starship_keys:
@@ -36,13 +39,32 @@ while not flagname:
         print(*starship_keys, sep=", ")
         user_input = input()
 
-#Reference: https://www.easypythondocs.com/validation.html
 
 
-newlist = sorted(data["results"], key=itemgetter(f'{user_input}')) 
+print("would you like to sort in ascending or descending order")
+
+sort_order = input()
+
+if sort_order == "ascending":
+    newlist = sorted(data["results"], key=itemgetter(f'{user_input}')) 
+elif sort_order == "descending":
+    newlist = sorted(data["results"], key=itemgetter(f'{user_input}'), reverse = True)     
+else:
+    "sorry, your input was not valid. Please enter either ascending or descending."
+    sort_order = input()
+    if sort_order == "ascending":
+        newlist = sorted(data["results"], key=itemgetter(f'{user_input}')) 
+    elif sort_order == "descending":
+        newlist = sorted(data["results"], key=itemgetter(f'{user_input}'), reverse = True)   
 
 names = [ item['name'] for item in newlist]
-print(names)
+values = [ item[f'{user_input}'] for item in newlist]
+
+sorted_list= merge(names, values)
+
+for i in sorted_list:
+    print(*i)
+#print(names)
 
 
 
