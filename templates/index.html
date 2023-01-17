@@ -1,0 +1,20 @@
+
+<body>
+</br>
+    <form name="swapi-form" action="/starships" method="POST">
+      <label for="sort-value">Choose sort value</label>
+        <select name="starship_value">
+          {% for value in starship_keys %}
+            <option value="{{ value }}" SELECTED>{{ value }}</option>
+          {% endfor %}     
+        </select>
+        </br>
+        </br>
+        <label for="sort_by">Would you like results sorted ascending or descending?</label>
+            <input name ="sort_by" value="Ascending"type="checkbox">Ascending</input>
+            <input name ="sort_by"value="Descending" type="checkbox">Descending</input> 
+        </br>
+        </br>
+        <button type="submit" id="btn" >submit</button>
+      </form>
+  </body>
