@@ -1,8 +1,6 @@
 
 <body>
 </br>
-<h2>All About Starships</h2>
-<h4>Which startship is has the highest hyperdrive rating? How about the largest crew? Simply pick an attribute you'd like to know more about and the order you'd like to sort the results and compare each ship.</h4>
     <form name="swapi-form" action="/starships" method="POST">
       <label for="sort-value">Choose sort value</label>
         <select name="starship_value" required>
@@ -21,7 +19,7 @@
         </br>
         <button type="submit" id="btn" >submit</button>
       </form>
-    </br>    
+    </br>
     <table>
         {% for ship in sorted_list %}
         <tr>
@@ -30,5 +28,4 @@
         </tr>
         {% endfor %}
     </table>
-
   </body>
