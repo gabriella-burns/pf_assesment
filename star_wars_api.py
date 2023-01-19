@@ -10,29 +10,64 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '#$%^&*'
 
 
-def build_starship_array(data, starship_keys):
-    for i in data['results']:
-        key_list = i.keys()
-        for x in key_list:
-            #print(x)
-            if x not in starship_keys:
-                starship_keys.append(x)
 
-def get_data():
+def get_urls():
+    url_list = ["https://swapi.dev/api/starships/"]
     response = requests.get("https://swapi.dev/api/starships/")
-    starship_keys = []
-
     data = response.json()
-    build_starship_array(data, starship_keys)
-    #loop that calls endpoint until it's done, shove everything in dictionary 
     while data["next"] != None:
-        print(data["next"])
+        #print(data["next"])
+        url=data["next"]
+        url_list.append(url)
         response = requests.get(data["next"])
         data = response.json()
-        build_starship_array(data, starship_keys)
-    
+    #print(url_list)
+
+    return url_list
+
+def get_data():
+    url_list = get_urls()
+    dict_list = []
+    for url in url_list:
+        response = requests.get(url)
+        data = response.json()
+        results = data["results"]
+        dict_list.append(results)
+        #print(f'dict list:{dict_list}')
+    data = json.dumps(dict_list, indent =2)
+    return data
+
+
+# def get_keys(starship_keys):
+#     data = get_data()
+#     data_j = json.dump(data)
+#     #print(f'data: {data}')
+#     for i in data_j:
+#         print(i)
+#         key_list = i.keys()
+#         #print(key_list)
+#         for x in key_list:
+#             #print(x)
+#             if x not in starship_keys:
+#                 starship_keys.append(x)
+#     return starship_keys
+def get_keys():  
+    starship_keys = []
+    response = requests.get("https://swapi.dev/api/starships/")
+    data = response.json()       
+    for i in data["results"]:
+        key_list = i.keys()
+        #print(key_list)
+        for x in key_list:
+            print(x)
+            if x not in starship_keys:
+                starship_keys.append(x)
     return starship_keys
 
+get_urls()
+
+get_data()
+get_keys()
 
 # having an attribute different than what you sort by could be easier 
 # named tuples (could use for headers in the 4 loop)
@@ -51,20 +86,22 @@ def merge(names, values):
 @app.route("/")
 def index():
 
-    return render_template("index.html", starship_keys=get_data())
+    return render_template("index.html", starship_keys=get_keys())
 
 @app.route("/")
 @app.route('/starships', methods = ['POST'])
 def starships():
+
     data = get_data()
+    print(data)
 
     sort_value = request.form["starship_value"]
     sort_order = request.form["sort_by"]
 
     if sort_order == "Ascending":
-        newlist = sorted(data["results"], key=itemgetter(f'{sort_value}'))
+        newlist = sorted(data, key=itemgetter(f'{sort_value}'))
     elif sort_order == "Descending":
-        newlist = sorted(data["results"], key=itemgetter(f'{sort_value}'), reverse = True)     
+        newlist = sorted(data, key=itemgetter(f'{sort_value}'), reverse = True)     
 
     names = [ item['name'] for item in newlist]
     values = [ item[f'{sort_value}'] for item in newlist]
